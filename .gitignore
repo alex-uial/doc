@@ -1,1 +1,9 @@
-*.zip
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+dbg
+tmptest/obj/
+tmptest/mocgen/

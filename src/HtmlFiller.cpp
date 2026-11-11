@@ -26,7 +26,7 @@ double extractMm(const QString &style, const QString &key) {
 }
 
 QVector<DataSlot> findDataSlots(QDomElement sheet) {
-    QVector<DataSlot> slots;
+    QVector<DataSlot> dataSlots;
     // Collect cells by data-row
     QMap<int, QMap<QString, QDomElement>> rows;
     QDomNodeList cells = sheet.elementsByTagName("div");
@@ -56,9 +56,9 @@ QVector<DataSlot> findDataSlots(QDomElement sheet) {
         if (s.widthPos < 1) s.widthPos = 20;
         if (s.widthName < 1) s.widthName = 110;
         if (s.height < 1) s.height = 8;
-        slots.append(s);
+        dataSlots.append(s);
     }
-    return slots;
+    return dataSlots;
 }
 
 void setCellText(QDomElement cell, const QString &text, bool wrap) {
@@ -95,10 +95,16 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
 
     QDomDocument doc;
     QString err;
-    int errLine = 0;
-    if (!doc.setContent(templateHtml, &err, &errLine)) {
+    int errLine = 0, errCol = 0;
+    // ROOT CAUSE OF "tag mismatch (строка 20)": the old 2-arg overload
+    // setContent(QString*, int*) enables namespace processing. The exported
+    // template is plain HTML without xmlns, so namespaced parsing dies at the
+    // first void/self-closing tag (<meta ... /> — line 20). Parse with an
+    // explicit namespaceProcessing=false overload (available in Qt5 and Qt6).
+    if (!doc.setContent(templateHtml, false, &err, &errLine, &errCol)) {
         res.html = templateHtml; // fallback
-        res.warnings << QString("Не удалось разобрать шаблон HTML: %1 (строка %2)").arg(err).arg(errLine);
+        res.warnings << QString("Не удалось разобрать шаблон HTML: %1 (строка %2, колонка %3)")
+                        .arg(err).arg(errLine).arg(errCol);
         return res;
     }
 
@@ -131,10 +137,10 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
 
     int itemIdx = 0;
     auto fillSheet = [&](QDomElement sheet, bool isFirst) -> int {
-        QVector<DataSlot> slots = findDataSlots(sheet);
-        if (!isFirst) res.capacityPerPage = qMax(res.capacityPerPage, slots.size());
+        QVector<DataSlot> dataSlots = findDataSlots(sheet);
+        if (!isFirst) res.capacityPerPage = qMax(res.capacityPerPage, dataSlots.size());
         int filled = 0;
-        for (const DataSlot &slot : slots) {
+        for (const DataSlot &slot : dataSlots) {
             if (itemIdx >= items.size()) break;
             const BomItem &it = items[itemIdx];
             auto fields = processItem(it);
@@ -173,7 +179,7 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
     while (itemIdx < items.size()) {
         QDomElement s = sheet1.cloneNode(true).toElement();
         int filled = fillSheet(s, false);
-        if (filled == 0) break; // no more slots
+        if (filled == 0) break; // no more dataSlots
         body.appendChild(s);
         ++res.pagesUsed;
     }
