@@ -180,10 +180,43 @@ if (BUILD_SHARED_LIBS)
     target_compile_definitions(QXlsx PUBLIC QXlsx_SHAREDLIB)
 endif()
 
-target_link_libraries(${PROJECT_NAME}
-   Qt${QT_VERSION_MAJOR}::Core
-   Qt${QT_VERSION_MAJOR}::GuiPrivate
-)
+if(QT_VERSION_MAJOR EQUAL 6)
+    target_link_libraries(${PROJECT_NAME}
+       Qt${QT_VERSION_MAJOR}::Core
+       Qt${QT_VERSION_MAJOR}::GuiPrivate
+    )
+else()
+    # Qt5 ships QZipReader/QZipWriter as private headers/symbols inside QtGui;
+    # there is no separate GuiPrivate CMake module, so link Gui directly and
+    # add the versioned private include dir manually.
+    find_package(Qt5 COMPONENTS Xml REQUIRED)
+    # Locate the versioned private QtGui headers shipped by qtbase-private-dev,
+    # e.g. /usr/include/x86_64-linux-gnu/qt5/5.15.8/QtGui/private
+    set(_qt5_ver "${Qt5_VERSION}")           # e.g. 5.15.8, filled by find_package(Qt5)
+    if(NOT _qt5_ver)
+        set(_qt5_ver "${Qt5Core_VERSION}")
+    endif()
+    file(TO_CMAKE_PATH "$ENV{Qt5_DIR}" _qt5_dir_path)
+    file(GLOB _qt5_guipriv_candidates
+         "/usr/include/*/qt${QT_VERSION_MAJOR}/${_qt5_ver}/QtGui/private"
+         "/usr/include/qt${QT_VERSION_MAJOR}/${_qt5_ver}/QtGui/private"
+         "/usr/local/include/qt${QT_VERSION_MAJOR}/${_qt5_ver}/QtGui/private")
+    if(_qt5_guipriv_candidates)
+        list(GET _qt5_guipriv_candidates 0 _qt5_gui_priv_inc)
+    else()
+        set(_qt5_gui_priv_inc "")
+    endif()
+    if(EXISTS "${_qt5_gui_priv_inc}")
+        target_include_directories(${PROJECT_NAME} PRIVATE "${_qt5_gui_priv_inc}")
+    else()
+        message(WARNING "Qt5 private QtGui headers not found at ${_qt5_gui_priv_inc}; install qtbase5-private-dev")
+    endif()
+    target_link_libraries(${PROJECT_NAME}
+       Qt${QT_VERSION_MAJOR}::Core
+       Qt${QT_VERSION_MAJOR}::Gui
+       Qt${QT_VERSION_MAJOR}::Xml
+    )
+endif()
 
 target_include_directories(QXlsx
 PRIVATE

@@ -93,17 +93,36 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
         return res;
     }
 
+    // The template is HTML, not XHTML: <meta>, <br>, <col ...> may be left
+    // unclosed and CSS inside <style> contains raw '<'. QDomDocument needs
+    // well-formed XML, so sanitize before parsing; otherwise we get
+    // "tag mismatch (line ~20)" and an empty output document.
+    QString sanitized = templateHtml;
+
+    // 1) Self-close void tags that are not already closed
+    static const QRegularExpression voidTagRe(
+        "<\\s*(meta|br|hr|img|input|link|col|area|base|embed|source|track|wbr)\\b([^<>]*?)(/?)>",
+        QRegularExpression::CaseInsensitiveOption);
+    sanitized = sanitized.replace(voidTagRe, "<$1$2/>");
+
+    // 2) Hide CSS/comments from the XML parser (they may contain '<', '&')
+    static const QRegularExpression styleRe("<style[^>]*>.*?</style>",
+                                            QRegularExpression::DotMatchesEverythingOption
+                                            | QRegularExpression::CaseInsensitiveOption);
+    sanitized = sanitized.replace(styleRe, "<style/>");
+    static const QRegularExpression commentRe("<!--.*?-->",
+                                              QRegularExpression::DotMatchesEverythingOption);
+    sanitized = sanitized.replace(commentRe, QString());
+
     QDomDocument doc;
     QString err;
     int errLine = 0, errCol = 0;
-    // ROOT CAUSE OF "tag mismatch (строка 20)": the old 2-arg overload
-    // setContent(QString*, int*) enables namespace processing. The exported
-    // template is plain HTML without xmlns, so namespaced parsing dies at the
-    // first void/self-closing tag (<meta ... /> — line 20). Parse with an
-    // explicit namespaceProcessing=false overload (available in Qt5 and Qt6).
-    if (!doc.setContent(templateHtml, false, &err, &errLine, &errCol)) {
-        res.html = templateHtml; // fallback
-        res.warnings << QString("Не удалось разобрать шаблон HTML: %1 (строка %2, колонка %3)")
+    // Namespace processing must stay OFF: the exported template has no xmlns,
+    // so namespaced parsing dies at the first void tag (<meta> — line 20).
+    if (!doc.setContent(sanitized, false, &err, &errLine, &errCol)) {
+        res.html = templateHtml; // fallback: original untouched template
+        res.warnings << QString("Не удалось разобрать шаблон HTML: %1 (строка %2, колонка %3). "
+                                "В выходном файле данные НЕ заполнены — проверьте шаблон.")
                         .arg(err).arg(errLine).arg(errCol);
         return res;
     }
@@ -188,7 +207,27 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
     body.removeChild(sheet0);
     body.removeChild(sheet1);
 
-    res.html = doc.toString(0);
+    // Restore the original <style> block (it was replaced by <style/> during
+    // sanitization so the XML parser could handle raw CSS).
+    QDomElement styleEl = doc.documentElement().elementsByTagName("head")
+                              .at(0).toElement().firstChildElement("style");
+    if (!styleEl.isNull()) {
+        static const QRegularExpression origStyleRe("<style[^>]*>(.*?)</style>",
+                                                    QRegularExpression::DotMatchesEverythingOption
+                                                    | QRegularExpression::CaseInsensitiveOption);
+        auto m = origStyleRe.match(templateHtml);
+        if (m.hasMatch()) {
+            while (styleEl.hasChildNodes()) styleEl.removeChild(styleEl.firstChild());
+            styleEl.appendChild(doc.createTextNode(m.captured(1)));
+        }
+    }
+
+    QString out = doc.toString(0);
+    // <!DOCTYPE html> is mandatory: without it browsers render in quirks mode
+    // and the absolutely-positioned cell layout collapses.
+    if (!out.startsWith("<!DOCTYPE", Qt::CaseInsensitive))
+        out = "<!DOCTYPE html>\n" + out;
+    res.html = out;
     if (itemIdx < items.size()) {
         res.warnings << QString("Не все элементы поместились: осталось %1").arg(items.size() - itemIdx);
     }

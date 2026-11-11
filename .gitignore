@@ -1,9 +1,3 @@
-*.o
-*.obj
-*.exe
-*.dll
-*.so
-*.a
-dbg
-tmptest/obj/
-tmptest/mocgen/
+build/
+build2/
+*.log
