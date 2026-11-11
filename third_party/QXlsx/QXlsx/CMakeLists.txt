@@ -186,31 +186,57 @@ if(QT_VERSION_MAJOR EQUAL 6)
        Qt${QT_VERSION_MAJOR}::GuiPrivate
     )
 else()
-    # Qt5 ships QZipReader/QZipWriter as private headers/symbols inside QtGui;
-    # there is no separate GuiPrivate CMake module, so link Gui directly and
-    # add the versioned private include dir manually.
-    find_package(Qt5 COMPONENTS Xml REQUIRED)
-    # Locate the versioned private QtGui headers shipped by qtbase-private-dev,
-    # e.g. /usr/include/x86_64-linux-gnu/qt5/5.15.8/QtGui/private
-    set(_qt5_ver "${Qt5_VERSION}")           # e.g. 5.15.8, filled by find_package(Qt5)
+    # Qt5 ships QZipReader/QZipWriter as *private* classes inside QtGui.
+    # Their headers live in a versioned "private" directory that is NOT on the
+    # default include path (qtbase5-private-dev on Linux, full Qt install on
+    # Windows/msys2). Locate it robustly and add it to the include path.
+    set(_qt5_ver "${Qt5_VERSION}")
     if(NOT _qt5_ver)
         set(_qt5_ver "${Qt5Core_VERSION}")
     endif()
-    file(TO_CMAKE_PATH "$ENV{Qt5_DIR}" _qt5_dir_path)
-    file(GLOB _qt5_guipriv_candidates
-         "/usr/include/*/qt${QT_VERSION_MAJOR}/${_qt5_ver}/QtGui/private"
-         "/usr/include/qt${QT_VERSION_MAJOR}/${_qt5_ver}/QtGui/private"
-         "/usr/local/include/qt${QT_VERSION_MAJOR}/${_qt5_ver}/QtGui/private")
-    if(_qt5_guipriv_candidates)
-        list(GET _qt5_guipriv_candidates 0 _qt5_gui_priv_inc)
-    else()
-        set(_qt5_gui_priv_inc "")
+
+    # Ask qmake where the real Qt headers are (works on msys2/Windows too).
+    find_program(_QXLSX_QMAKE_EXECUTABLE NAMES qmake qmake-qt5)
+    set(_qmake_hdr "")
+    if(_QXLSX_QMAKE_EXECUTABLE)
+        execute_process(COMMAND ${_QXLSX_QMAKE_EXECUTABLE} -query QT_INSTALL_HEADERS
+                        OUTPUT_VARIABLE _qmake_hdr OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
     endif()
-    if(EXISTS "${_qt5_gui_priv_inc}")
+
+    set(_qt5_gui_priv_inc "")
+    foreach(_base "${_qmake_hdr}"
+                  "/usr/include/x86_64-linux-gnu/qt5"
+                  "/usr/include/qt5"
+                  "/usr/local/include/qt5")
+        if(_base AND EXISTS "${_base}/${_qt5_ver}/QtGui/private/qzipreader_p.h")
+            set(_qt5_gui_priv_inc "${_base}/${_qt5_ver}/QtGui/private")
+            break()
+        endif()
+    endforeach()
+
+    if(NOT _qt5_gui_priv_inc)
+        # Last resort: recursive search under the qmake-reported header root.
+        if(_qmake_hdr)
+            file(GLOB_RECURSE _found_zip FOLLOW_SYMLINKS
+                 "${_qmake_hdr}/*/qzipreader_p.h")
+            if(_found_zip)
+                get_filename_component(_qt5_gui_priv_inc "${_found_zip}" DIRECTORY)
+            endif()
+        endif()
+    endif()
+
+    if(_qt5_gui_priv_inc)
+        message(STATUS "QXlsx: using Qt5 private headers from ${_qt5_gui_priv_inc}")
         target_include_directories(${PROJECT_NAME} PRIVATE "${_qt5_gui_priv_inc}")
     else()
-        message(WARNING "Qt5 private QtGui headers not found at ${_qt5_gui_priv_inc}; install qtbase5-private-dev")
+        message(FATAL_ERROR
+          "QXlsx: could not locate Qt5 private headers (qzipreader_p.h).\n"
+          "  Linux:  install qtbase5-private-dev\n"
+          "  msys2:  pacman -S mingw-w64-x86_64-qt5 (full package, includes private headers)\n"
+          "  MSVC:   make sure the Qt component 'Qt <> > 5.x > MinGW/MSVC' with sources is installed.")
     endif()
+
+    find_package(Qt5 COMPONENTS Xml REQUIRED)
     target_link_libraries(${PROJECT_NAME}
        Qt${QT_VERSION_MAJOR}::Core
        Qt${QT_VERSION_MAJOR}::Gui

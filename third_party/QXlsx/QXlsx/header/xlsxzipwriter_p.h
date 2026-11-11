@@ -1,14 +1,14 @@
-// xlsxzipwriter_p.h
+// xlsxzipwriter_p.h — internal wrapper over miniz ZIP writer (writes to a QIODevice).
+// No Qt private headers required (portable across MSVC / MinGW / Linux).
 
 #ifndef QXLSX_ZIPWRITER_H
 #define QXLSX_ZIPWRITER_H
 
 #include "xlsxglobal.h"
 
+#include <QByteArray>
 #include <QIODevice>
 #include <QString>
-
-class QZipWriter;
 
 QT_BEGIN_NAMESPACE_XLSX
 
@@ -25,7 +25,18 @@ public:
     void close();
 
 private:
-    QZipWriter *m_writer;
+    Q_DISABLE_COPY(ZipWriter)
+    void finish();
+
+    QIODevice *m_device = nullptr;
+    QFile *m_file = nullptr;  // owned file when constructed from a path
+    bool m_ownsDevice = false;
+    QByteArray m_entries;   // serialized local file headers + data
+    QByteArray m_central;   // serialized central directory
+    quint16 m_numEntries = 0;
+    quint32 m_offset = 0;   // running offset into the archive body
+    bool m_finished = false;
+    bool m_error = false;
 };
 
 QT_END_NAMESPACE_XLSX

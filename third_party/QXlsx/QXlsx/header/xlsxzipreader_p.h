@@ -1,18 +1,19 @@
-// xlsxzipreader_p.h
+// xlsxzipreader_p.h — internal wrapper over miniz ZIP reader.
+// No Qt private headers required (portable across MSVC / MinGW / Linux).
 
 #ifndef QXLSX_XLSXZIPREADER_P_H
 #define QXLSX_XLSXZIPREADER_P_H
 
 #include "xlsxglobal.h"
 
+#include <QByteArray>
 #include <QIODevice>
-#include <QScopedPointer>
+#include <QString>
 #include <QStringList>
-#include <QVector>
-
-class QZipReader;
 
 QT_BEGIN_NAMESPACE_XLSX
+
+class ZipData;
 
 class ZipReader
 {
@@ -27,7 +28,7 @@ public:
 private:
     Q_DISABLE_COPY(ZipReader)
     void init();
-    QScopedPointer<QZipReader> m_reader;
+    QScopedPointer<ZipData> m_d;
     QStringList m_filePaths;
 };
 
