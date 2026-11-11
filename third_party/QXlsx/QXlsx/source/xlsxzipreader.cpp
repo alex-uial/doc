@@ -11,25 +11,21 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-namespace {
-
-struct ZipData
+struct ReaderData
 {
     QByteArray buffer;                       // whole file kept in memory (xlsx files are small)
     mz_zip_archive archive;
     bool archiveInited = false;
 
-    ~ZipData()
+    ~ReaderData()
     {
         if (archiveInited)
             mz_zip_end(&archive);
     }
 };
 
-} // namespace
-
 ZipReader::ZipReader(const QString &filePath)
-    : m_d(new ZipData)
+    : m_d(new ReaderData)
 {
     QFile f(filePath);
     if (f.open(QIODevice::ReadOnly))
@@ -39,7 +35,7 @@ ZipReader::ZipReader(const QString &filePath)
 }
 
 ZipReader::ZipReader(QIODevice *device)
-    : m_d(new ZipData)
+    : m_d(new ReaderData)
 {
     if (device && device->isOpen())
         m_d->buffer = device->readAll();

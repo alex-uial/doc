@@ -55,6 +55,10 @@ isEmpty(QXLSX_SOURCEPATH) {
     message( $${QXLSX_SOURCEPATH} )
 }
 
+# Bundled miniz (used by our xlsxzipreader/xlsxzipwriter instead of Qt private headers)
+QXLSX_3RDPARTY = $$PWD/3rdparty
+INCLUDEPATH += $$QXLSX_3RDPARTY
+
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $${QXLSX_PARENTPATH}
 INCLUDEPATH += $${QXLSX_HEADERPATH}
@@ -146,7 +150,11 @@ $${QXLSX_SOURCEPATH}xlsxworkbook.cpp \
 $${QXLSX_SOURCEPATH}xlsxworksheet.cpp \
 $${QXLSX_SOURCEPATH}xlsxzipreader.cpp \
 $${QXLSX_SOURCEPATH}xlsxzipwriter.cpp \
-$${QXLSX_SOURCEPATH}xlsxreadsax.cpp
+$${QXLSX_SOURCEPATH}xlsxreadsax.cpp \
+$$QXLSX_3RDPARTY/miniz.c \
+$$QXLSX_3RDPARTY/miniz_tdef.c \
+$$QXLSX_3RDPARTY/miniz_tinfl.c \
+$$QXLSX_3RDPARTY/miniz_zip.c
 
 ########################################
 # custom setting for compiler & system

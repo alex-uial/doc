@@ -13,7 +13,7 @@
 
 QT_BEGIN_NAMESPACE_XLSX
 
-class ZipData;
+class ReaderData;
 
 class ZipReader
 {
@@ -28,7 +28,7 @@ public:
 private:
     Q_DISABLE_COPY(ZipReader)
     void init();
-    QScopedPointer<ZipData> m_d;
+    QScopedPointer<ReaderData> m_d;
     QStringList m_filePaths;
 };
 

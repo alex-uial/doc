@@ -1,0 +1,76 @@
+../third_party/QXlsx/QXlsx/source/xlsxzipreader.cpp:5:10: fatal error: private/qzipreader_p.h: No such file or directory
+    5 | #include <private/qzipreader_p.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+../third_party/QXlsx/QXlsx/source/xlsxzipwriter.cpp:5:10: fatal error: private/qzipwriter_p.h: No such file or directory
+    5 | #include <private/qzipwriter_p.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+/usr/bin/ld: obj/xlsxdocument.o: in function `QXlsx::DocumentPrivate::loadPackage(QIODevice*)':
+xlsxdocument.cpp:(.text+0xd4e): undefined reference to `QXlsx::ZipReader::ZipReader(QIODevice*)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0xd67): undefined reference to `QXlsx::ZipReader::filePaths() const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0xe5a): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0xf1b): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x1012): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x1202): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x14b9): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: obj/xlsxdocument.o:xlsxdocument.cpp:(.text+0x156a): more undefined references to `QXlsx::ZipReader::fileData(QString const&) const' follow
+/usr/bin/ld: obj/xlsxdocument.o: in function `QXlsx::DocumentPrivate::loadPackage(QIODevice*)':
+xlsxdocument.cpp:(.text+0x1c43): undefined reference to `QXlsx::ZipReader::filePaths() const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x1ca5): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x1d0e): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x1e22): undefined reference to `QXlsx::ZipReader::filePaths() const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x1e84): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x1eed): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x2018): undefined reference to `QXlsx::ZipReader::filePaths() const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x207a): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x20e3): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x2235): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x23d3): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x2550): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x2bff): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: obj/xlsxdocument.o: in function `QXlsx::DocumentPrivate::savePackage(QIODevice*) const':
+xlsxdocument.cpp:(.text+0x341a): undefined reference to `QXlsx::ZipWriter::ZipWriter(QIODevice*)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x3429): undefined reference to `QXlsx::ZipWriter::error() const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x370c): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x3817): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x3b06): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x3c11): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x3e25): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: obj/xlsxdocument.o:xlsxdocument.cpp:(.text+0x3f25): more undefined references to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)' follow
+/usr/bin/ld: obj/xlsxdocument.o: in function `QXlsx::DocumentPrivate::savePackage(QIODevice*) const':
+xlsxdocument.cpp:(.text+0x50be): undefined reference to `QXlsx::ZipWriter::close()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x513b): undefined reference to `QXlsx::ZipWriter::~ZipWriter()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x5823): undefined reference to `QXlsx::ZipWriter::~ZipWriter()'
+/usr/bin/ld: obj/xlsxdocument.o: in function `QXlsx::DocumentPrivate::copyStyle(QString const&, QString const&)':
+xlsxdocument.cpp:(.text+0x6036): undefined reference to `QXlsx::ZipWriter::ZipWriter(QIODevice*)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x604f): undefined reference to `QXlsx::ZipReader::ZipReader(QString const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6068): undefined reference to `QXlsx::ZipReader::filePaths() const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6081): undefined reference to `QXlsx::ZipReader::ZipReader(QString const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x609a): undefined reference to `QXlsx::ZipReader::filePaths() const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6168): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x61d5): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x631d): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x63de): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x644b): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6593): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6654): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x66c1): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x67e2): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6838): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6855): undefined reference to `QXlsx::ZipWriter::addFile(QString const&, QByteArray const&)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x68b2): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x68c1): undefined reference to `QXlsx::ZipWriter::close()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x691b): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x692a): undefined reference to `QXlsx::ZipWriter::~ZipWriter()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6bd5): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6bfd): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x6c11): undefined reference to `QXlsx::ZipWriter::~ZipWriter()'
+/usr/bin/ld: obj/xlsxdocument.o: in function `QXlsx::Document::read_sheet_sax(int, QXlsx::sax_options const&, std::function<bool (QXlsx::sax_cell const&)> const&)':
+xlsxdocument.cpp:(.text+0x94b0): undefined reference to `QXlsx::ZipReader::ZipReader(QIODevice*)'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x9565): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x95e5): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: xlsxdocument.cpp:(.text+0x9691): undefined reference to `QXlsx::ZipReader::~ZipReader()'
+/usr/bin/ld: obj/xlsxreadsax.o: in function `QXlsx::load_shared_strings_all(QXlsx::ZipReader&)':
+xlsxreadsax.cpp:(.text+0x2dc): undefined reference to `QXlsx::ZipReader::fileData(QString const&) const'
+collect2: error: ld returned 1 exit status

@@ -1,0 +1,30 @@
+[  2%] Automatic MOC for target QXlsx
+[  2%] Built target QXlsx_autogen
+[  4%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxcontenttypes.cpp.o
+[  6%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/QXlsx_autogen/mocs_compilation.cpp.o
+[  8%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxcellrange.cpp.o
+[ 11%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxdrawinganchor.cpp.o
+[ 13%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxrichstring.cpp.o
+[ 15%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxworkbook.cpp.o
+[ 17%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxabstractooxmlfile.cpp.o
+[ 20%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxcellreference.cpp.o
+[ 22%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxdatavalidation.cpp.o
+[ 24%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxdrawing.cpp.o
+[ 26%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxsharedstrings.cpp.o
+[ 28%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxworksheet.cpp.o
+[ 31%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxabstractsheet.cpp.o
+[ 33%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxchart.cpp.o
+[ 35%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxdatetype.cpp.o
+[ 37%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxformat.cpp.o
+[ 40%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxsimpleooxmlfile.cpp.o
+[ 42%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxzipreader.cpp.o
+[ 44%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxcell.cpp.o
+[ 46%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxchartsheet.cpp.o
+/workspace/third_party/QXlsx/QXlsx/source/xlsxzipreader.cpp:5:10: fatal error: private/qzipreader_p.h: No such file or directory
+    5 | #include <private/qzipreader_p.h>
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+gmake[2]: *** [third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/build.make:314: third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxzipreader.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+gmake[1]: *** [CMakeFiles/Makefile2:155: third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/all] Error 2
+gmake: *** [Makefile:156: all] Error 2

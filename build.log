@@ -1,0 +1,13 @@
+[  2%] Automatic MOC for target QXlsx
+[  2%] Built target QXlsx_autogen
+[  4%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxdocpropsapp.cpp.o
+[  6%] Building CXX object third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxzipreader.cpp.o
+/workspace/third_party/QXlsx/QXlsx/source/xlsxzipreader.cpp: In member function ‘QByteArray QXlsx::ZipReader::fileData(const QString&) const’:
+/workspace/third_party/QXlsx/QXlsx/source/xlsxzipreader.cpp:92:23: error: ‘mz_zip_reader_find_file’ was not declared in this scope; did you mean ‘mz_zip_reader_init_file’?
+   92 |     const int index = mz_zip_reader_find_file(&m_d->archive, fileName.toUtf8().constData());
+      |                       ^~~~~~~~~~~~~~~~~~~~~~~
+      |                       mz_zip_reader_init_file
+gmake[2]: *** [third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/build.make:314: third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/source/xlsxzipreader.cpp.o] Error 1
+gmake[2]: *** Waiting for unfinished jobs....
+gmake[1]: *** [CMakeFiles/Makefile2:155: third_party/QXlsx/QXlsx/CMakeFiles/QXlsx.dir/all] Error 2
+gmake: *** [Makefile:156: all] Error 2

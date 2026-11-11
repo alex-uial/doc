@@ -68,6 +68,10 @@ set(SRC_FILES
     source/xlsxformat.cpp
     source/xlsxsimpleooxmlfile.cpp
     source/xlsxzipreader.cpp
+    3rdparty/miniz.c
+    3rdparty/miniz_tdef.c
+    3rdparty/miniz_tinfl.c
+    3rdparty/miniz_zip.c
     source/xlsxcell.cpp
     source/xlsxchartsheet.cpp
     source/xlsxdocpropsapp.cpp
@@ -180,69 +184,16 @@ if (BUILD_SHARED_LIBS)
     target_compile_definitions(QXlsx PUBLIC QXlsx_SHAREDLIB)
 endif()
 
-if(QT_VERSION_MAJOR EQUAL 6)
-    target_link_libraries(${PROJECT_NAME}
-       Qt${QT_VERSION_MAJOR}::Core
-       Qt${QT_VERSION_MAJOR}::GuiPrivate
-    )
-else()
-    # Qt5 ships QZipReader/QZipWriter as *private* classes inside QtGui.
-    # Their headers live in a versioned "private" directory that is NOT on the
-    # default include path (qtbase5-private-dev on Linux, full Qt install on
-    # Windows/msys2). Locate it robustly and add it to the include path.
-    set(_qt5_ver "${Qt5_VERSION}")
-    if(NOT _qt5_ver)
-        set(_qt5_ver "${Qt5Core_VERSION}")
-    endif()
-
-    # Ask qmake where the real Qt headers are (works on msys2/Windows too).
-    find_program(_QXLSX_QMAKE_EXECUTABLE NAMES qmake qmake-qt5)
-    set(_qmake_hdr "")
-    if(_QXLSX_QMAKE_EXECUTABLE)
-        execute_process(COMMAND ${_QXLSX_QMAKE_EXECUTABLE} -query QT_INSTALL_HEADERS
-                        OUTPUT_VARIABLE _qmake_hdr OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-    endif()
-
-    set(_qt5_gui_priv_inc "")
-    foreach(_base "${_qmake_hdr}"
-                  "/usr/include/x86_64-linux-gnu/qt5"
-                  "/usr/include/qt5"
-                  "/usr/local/include/qt5")
-        if(_base AND EXISTS "${_base}/${_qt5_ver}/QtGui/private/qzipreader_p.h")
-            set(_qt5_gui_priv_inc "${_base}/${_qt5_ver}/QtGui/private")
-            break()
-        endif()
-    endforeach()
-
-    if(NOT _qt5_gui_priv_inc)
-        # Last resort: recursive search under the qmake-reported header root.
-        if(_qmake_hdr)
-            file(GLOB_RECURSE _found_zip FOLLOW_SYMLINKS
-                 "${_qmake_hdr}/*/qzipreader_p.h")
-            if(_found_zip)
-                get_filename_component(_qt5_gui_priv_inc "${_found_zip}" DIRECTORY)
-            endif()
-        endif()
-    endif()
-
-    if(_qt5_gui_priv_inc)
-        message(STATUS "QXlsx: using Qt5 private headers from ${_qt5_gui_priv_inc}")
-        target_include_directories(${PROJECT_NAME} PRIVATE "${_qt5_gui_priv_inc}")
-    else()
-        message(FATAL_ERROR
-          "QXlsx: could not locate Qt5 private headers (qzipreader_p.h).\n"
-          "  Linux:  install qtbase5-private-dev\n"
-          "  msys2:  pacman -S mingw-w64-x86_64-qt5 (full package, includes private headers)\n"
-          "  MSVC:   make sure the Qt component 'Qt <> > 5.x > MinGW/MSVC' with sources is installed.")
-    endif()
-
-    find_package(Qt5 COMPONENTS Xml REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-       Qt${QT_VERSION_MAJOR}::Core
-       Qt${QT_VERSION_MAJOR}::Gui
-       Qt${QT_VERSION_MAJOR}::Xml
-    )
-endif()
+# NOTE: xlsxzipreader.cpp / xlsxzipwriter.cpp are reimplemented on top of the
+# bundled miniz (3rdparty/miniz.*), so QXlsx does NOT need any Qt *private*
+# headers anymore. The library builds with any plain Qt5/Qt6 kit:
+# MSVC, MinGW (msys2), Linux — no qtbase5-private-dev required.
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Xml REQUIRED)
+target_link_libraries(${PROJECT_NAME}
+   Qt${QT_VERSION_MAJOR}::Core
+   Qt${QT_VERSION_MAJOR}::Gui
+   Qt${QT_VERSION_MAJOR}::Xml
+)
 
 target_include_directories(QXlsx
 PRIVATE
