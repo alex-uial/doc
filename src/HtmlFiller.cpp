@@ -115,17 +115,8 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
     QDomElement sheet0 = sections.at(0).toElement();
     QDomElement sheet1 = sections.at(1).toElement();
 
-    // Remove original sheets from body; we will rebuild
-    QDomElement newBody = doc.createElement("body");
-    // Keep any non-section content? usually none
-    while (body.hasChildNodes()) {
-        QDomNode n = body.firstChild();
-        if (n.isElement() && n.toElement().tagName() == "section") {
-            body.removeChild(n);
-        } else {
-            newBody.appendChild(n);
-        }
-    }
+    // Original sheets are removed from the body right before serialization;
+    // we work on deep clones and append them to the same body.
 
     auto processItem = [](const BomItem &it) -> QStringList {
         QString pos = DesignatorParser::groupAndSort(it.designator);
@@ -141,6 +132,7 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
     int itemIdx = 0;
     auto fillSheet = [&](QDomElement sheet, bool isFirst) -> int {
         QVector<DataSlot> slots = findDataSlots(sheet);
+        if (!isFirst) res.capacityPerPage = qMax(res.capacityPerPage, slots.size());
         int filled = 0;
         for (const DataSlot &slot : slots) {
             if (itemIdx >= items.size()) break;
@@ -174,19 +166,21 @@ FillResult HtmlFiller::fill(const QString &templateHtml, const QVector<BomItem> 
     // First sheet (unique)
     QDomElement s0 = sheet0.cloneNode(true).toElement();
     fillSheet(s0, true);
-    newBody.appendChild(s0);
+    body.appendChild(s0);
+    ++res.pagesUsed;
 
-    // Continuation sheets (repeat sheet1)
+    // Continuation sheets (repeat sheet2 of the template until everything fits)
     while (itemIdx < items.size()) {
         QDomElement s = sheet1.cloneNode(true).toElement();
         int filled = fillSheet(s, false);
         if (filled == 0) break; // no more slots
-        newBody.appendChild(s);
+        body.appendChild(s);
+        ++res.pagesUsed;
     }
 
-    // Replace body
-    QDomElement htmlRoot = doc.documentElement();
-    htmlRoot.replaceChild(newBody, body);
+    // Drop the two original template sheets (clones are already in the body)
+    body.removeChild(sheet0);
+    body.removeChild(sheet1);
 
     res.html = doc.toString(0);
     if (itemIdx < items.size()) {

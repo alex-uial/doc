@@ -11,6 +11,7 @@
 #include <QTextDocument>
 #include <QLabel>
 #include <QStandardPaths>
+#include <QSet>
 #include <QDir>
 #include <QCoreApplication>
 #include <algorithm>
@@ -132,14 +133,29 @@ void MainWindow::onGenerate() {
     }
     log->append(QString("Загружено %1 строк").arg(items.size()));
 
-    // Sort by designator (natural)
+    // Unique designators across the whole BOM (first column = Designator)
+    QSet<QString> uniqueTokens;
+    for (const BomItem &it : items)
+        for (const QString &t : DesignatorParser::extractTokens(it.designator))
+            uniqueTokens.insert(t);
+    log->append(QString("Уникальных Designator: %1").arg(uniqueTokens.size()));
+
+    // Check that numbering per prefix goes in order starting from C1/R1/...
+    QString seqProblem;
+    if (!DesignatorParser::checkSequentialFromOne(uniqueTokens.values(), &seqProblem))
+        log->append("⚠ Нумерация не последовательна от 1: " + seqProblem);
+    else
+        log->append("Нумерация последовательна (каждый префикс от 1 без пропусков)");
+
+    // Sort rows by designator: alphabetically by prefix, then numerically (C1,C2,...C10)
     std::sort(items.begin(), items.end(), [](const BomItem &a, const BomItem &b) {
         auto ka = DesignatorParser::sortKey(a.designator);
         auto kb = DesignatorParser::sortKey(b.designator);
         if (ka.first != kb.first) return ka.first < kb.first;
-        return ka.second < kb.second;
+        if (ka.second != kb.second) return ka.second < kb.second;
+        return a.designator < b.designator;
     });
-    log->append("Отсортировано по Designator");
+    log->append("Отсортировано по Designator (по алфавиту, затем по номеру)");
 
     // Load template
     QString tplPath = templateEdit->text();
@@ -156,6 +172,8 @@ void MainWindow::onGenerate() {
     for (const QString &w : result.warnings) {
         log->append("⚠ " + w);
     }
+    log->append(QString("Листов в документе: %1 (вместимость продолжения: %2 строк/лист)")
+                    .arg(result.pagesUsed).arg(result.capacityPerPage));
 
     QString htmlPath = outHtmlEdit->text();
     QString pdfPath = outPdfEdit->text();
